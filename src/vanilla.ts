@@ -61,11 +61,19 @@ type ProxyState = readonly [
 ]
 
 // shared state
-;((typeof window !== 'undefined' ? window : global) as any).proxyStateMap =
-  new WeakMap<ProxyObject, ProxyState>()
+const GLOBAL_PROXY_STATE_MAP_KEY = '__$valtio__proxyStateMap'
+const getProxyStateMap = () => {
+  const scope = (typeof window !== 'undefined' ? window : global) as Record<
+    string,
+    any
+  >
 
-const proxyStateMap = ((typeof window !== 'undefined' ? window : global) as any)
-  .proxyStateMap
+  if (!scope[GLOBAL_PROXY_STATE_MAP_KEY]) {
+    scope[GLOBAL_PROXY_STATE_MAP_KEY] = new WeakMap<ProxyObject, ProxyState>()
+  }
+
+  return scope[GLOBAL_PROXY_STATE_MAP_KEY]
+}
 
 const refSet = new WeakSet()
 
@@ -139,8 +147,8 @@ const buildProxyFunction = (
       } else if (value instanceof Promise) {
         delete desc.value
         desc.get = () => handlePromise(value)
-      } else if (proxyStateMap.has(value as object)) {
-        const [target, ensureVersion] = proxyStateMap.get(
+      } else if (getProxyStateMap().has(value as object)) {
+        const [target, ensureVersion] = getProxyStateMap().get(
           value as object
         ) as ProxyState
         desc.value = createSnapshot(
@@ -279,11 +287,11 @@ const buildProxyFunction = (
               notifyUpdate(['reject', [prop], e])
             })
         } else {
-          if (!proxyStateMap.has(value) && canProxy(value)) {
+          if (!getProxyStateMap().has(value) && canProxy(value)) {
             nextValue = proxyFunction(value)
           }
           const childProxyState =
-            !refSet.has(nextValue) && proxyStateMap.get(nextValue)
+            !refSet.has(nextValue) && getProxyStateMap().get(nextValue)
           if (childProxyState) {
             addPropListener(prop, childProxyState)
           }
@@ -301,7 +309,7 @@ const buildProxyFunction = (
       createSnapshot,
       addListener,
     ]
-    proxyStateMap.set(proxyObject, proxyState)
+    getProxyStateMap().set(proxyObject, proxyState)
     Reflect.ownKeys(initialObject).forEach((key) => {
       const desc = Object.getOwnPropertyDescriptor(
         initialObject,
@@ -323,7 +331,7 @@ const buildProxyFunction = (
     // public functions
     proxyFunction,
     // shared state
-    proxyStateMap,
+    getProxyStateMap(),
     refSet,
     // internal things
     objectIs,
@@ -343,7 +351,7 @@ export function proxy<T extends object>(initialObject: T = {} as T): T {
 }
 
 export function getVersion(proxyObject: unknown): number | undefined {
-  const proxyState = proxyStateMap.get(proxyObject as object)
+  const proxyState = getProxyStateMap().get(proxyObject as object)
   return proxyState?.[1]()
 }
 
@@ -352,7 +360,7 @@ export function subscribe<T extends object>(
   callback: (ops: Op[]) => void,
   notifyInSync?: boolean
 ): () => void {
-  const proxyState = proxyStateMap.get(proxyObject as object)
+  const proxyState = getProxyStateMap().get(proxyObject as object)
   let promise: Promise<void> | undefined
   const ops: Op[] = []
   const addListener = (proxyState as ProxyState)[3]
@@ -384,7 +392,7 @@ export function snapshot<T extends object>(
   proxyObject: T,
   handlePromise?: HandlePromise
 ): Snapshot<T> {
-  const proxyState = proxyStateMap.get(proxyObject as object)
+  const proxyState = getProxyStateMap().get(proxyObject as object)
   const [target, ensureVersion, createSnapshot] = proxyState as ProxyState
   return createSnapshot(target, ensureVersion(), handlePromise) as Snapshot<T>
 }
