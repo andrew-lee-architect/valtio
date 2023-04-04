@@ -6,9 +6,6 @@ import * as t from '@babel/types'
 import { MacroError, createMacro } from 'babel-plugin-macros'
 
 const macro = ({ references }: any) => {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn('[DEPRECATED] Use useProxy hook instead.')
-  }
   references.useProxy?.forEach((path: NodePath) => {
     const hook = addNamed(path, 'useSnapshot', 'valtio')
     const proxy = (path.parentPath?.get('arguments.0') as any)?.node

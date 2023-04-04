@@ -3,43 +3,10 @@
   "private": true,
   "version": "1.10.4",
   "description": "💊 Valtio makes proxy-state simple for React and Vanilla",
-  "main": "./index.js",
-  "types": "./index.d.ts",
-  "typesVersions": {
-    "<4.5": {
-      "esm/*": [
-        "ts3.4/*"
-      ],
-      "*": [
-        "ts3.4/*"
-      ]
-    }
-  },
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./index.d.ts",
-      "import": {
-        "types": "./esm/index.d.mts",
-        "default": "./esm/index.mjs"
-      },
-      "module": "./esm/index.js",
-      "default": "./index.js"
-    },
-    "./*": {
-      "types": "./*.d.ts",
-      "import": {
-        "types": "./esm/*.d.mts",
-        "default": "./esm/*.mjs"
-      },
-      "module": "./esm/*.js",
-      "default": "./*.js"
-    }
-  },
+  "main": "./dist/index.js",
   "files": [
     "**"
   ],
-  "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
     "build": "concurrently -m 8 'yarn:build:*'",

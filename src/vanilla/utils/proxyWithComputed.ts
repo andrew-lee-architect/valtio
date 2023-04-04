@@ -1,5 +1,5 @@
-import { proxy, snapshot } from '../../vanilla.ts'
-import type { INTERNAL_Snapshot as Snapshot } from '../../vanilla.ts'
+import { proxy, snapshot } from '../../vanilla'
+import type { INTERNAL_Snapshot as Snapshot } from '../../vanilla'
 
 /**
  * proxyWithComputed (DEPRECATED)
@@ -20,11 +20,6 @@ export function proxyWithComputed_DEPRECATED<
         }
   }
 ) {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn(
-      'proxyWithComputed is deprecated. Please follow "Computed Properties" guide in docs.'
-    )
-  }
   ;(Object.keys(computedFns) as (keyof U)[]).forEach((key) => {
     if (Object.getOwnPropertyDescriptor(initialObject, key)) {
       throw new Error('object property already defined')

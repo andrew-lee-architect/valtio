@@ -1,4 +1,4 @@
-import { getVersion, proxy, subscribe } from '../../vanilla.ts'
+import { getVersion, proxy, subscribe } from '../../vanilla'
 
 type DeriveGet = <T extends object>(proxyObject: T) => T
 

@@ -61,7 +61,12 @@ type ProxyState = readonly [
 ]
 
 // shared state
-const proxyStateMap = new WeakMap<ProxyObject, ProxyState>()
+;((typeof window !== 'undefined' ? window : global) as any).proxyStateMap =
+  new WeakMap<ProxyObject, ProxyState>()
+
+const proxyStateMap = ((typeof window !== 'undefined' ? window : global) as any)
+  .proxyStateMap
+
 const refSet = new WeakSet()
 
 const buildProxyFunction = (
@@ -197,9 +202,6 @@ const buildProxyFunction = (
       prop: string | symbol,
       propProxyState: ProxyState
     ) => {
-      if (import.meta.env?.MODE !== 'production' && propProxyStates.has(prop)) {
-        throw new Error('prop listener already exists')
-      }
       if (listeners.size) {
         const remove = propProxyState[3](createPropListener(prop))
         propProxyStates.set(prop, [propProxyState, remove])
@@ -217,10 +219,7 @@ const buildProxyFunction = (
     const addListener = (listener: Listener) => {
       listeners.add(listener)
       if (listeners.size === 1) {
-        propProxyStates.forEach(([propProxyState, prevRemove], prop) => {
-          if (import.meta.env?.MODE !== 'production' && prevRemove) {
-            throw new Error('remove already exists')
-          }
+        propProxyStates.forEach(([propProxyState, _prevRemove], prop) => {
           const remove = propProxyState[3](createPropListener(prop))
           propProxyStates.set(prop, [propProxyState, remove])
         })
@@ -354,9 +353,6 @@ export function subscribe<T extends object>(
   notifyInSync?: boolean
 ): () => void {
   const proxyState = proxyStateMap.get(proxyObject as object)
-  if (import.meta.env?.MODE !== 'production' && !proxyState) {
-    console.warn('Please use proxy object')
-  }
   let promise: Promise<void> | undefined
   const ops: Op[] = []
   const addListener = (proxyState as ProxyState)[3]
@@ -389,9 +385,6 @@ export function snapshot<T extends object>(
   handlePromise?: HandlePromise
 ): Snapshot<T> {
   const proxyState = proxyStateMap.get(proxyObject as object)
-  if (import.meta.env?.MODE !== 'production' && !proxyState) {
-    console.warn('Please use proxy object')
-  }
   const [target, ensureVersion, createSnapshot] = proxyState as ProxyState
   return createSnapshot(target, ensureVersion(), handlePromise) as Snapshot<T>
 }

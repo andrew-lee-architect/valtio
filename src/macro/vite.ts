@@ -52,9 +52,6 @@ export const valtioMacro = defineMacro(`useProxy`)
   })
 
 export function provideValtioMacro() {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn('[DEPRECATED] Use useProxy hook instead.')
-  }
   return defineMacroProvider({
     id: 'valtio/macro',
     exports: {

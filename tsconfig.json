@@ -1,21 +1,27 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
     "strict": true,
-    "jsx": "react-jsx",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "importHelpers": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "nodenext",
-    "skipLibCheck": true /* FIXME remove this once vite fixes it */,
-    "allowImportingTsExtensions": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "baseUrl": ".",
-    "paths": {
-      "valtio": ["./src/index.ts"],
-      "valtio/*": ["./src/*.ts"]
-    }
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "types": ["node"],
+    "lib": ["ES6", "DOM", "DOM.Iterable"]
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

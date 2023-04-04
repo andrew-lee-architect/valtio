@@ -1,39 +1,18 @@
 /// <reference types="react/experimental" />
 
-import ReactExports, {
-  useCallback,
-  useDebugValue,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
-import {
-  affectedToPathList,
-  createProxy as createProxyToCompare,
-  isChanged,
-} from 'proxy-compare'
+import ReactExports, { useCallback, useEffect, useMemo, useRef } from 'react'
+import { createProxy as createProxyToCompare, isChanged } from 'proxy-compare'
 // import { useSyncExternalStore } from 'use-sync-external-store/shim'
 // This doesn't work in ESM, because use-sync-external-store only exposes CJS.
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
 // eslint-disable-next-line import/extensions
 import useSyncExternalStoreExports from 'use-sync-external-store/shim'
-import { snapshot, subscribe } from './vanilla.ts'
-import type { INTERNAL_Snapshot as Snapshot } from './vanilla.ts'
+import { snapshot, subscribe } from './vanilla'
+import type { INTERNAL_Snapshot as Snapshot } from './vanilla'
 
 const { use } = ReactExports
 const { useSyncExternalStore } = useSyncExternalStoreExports
-
-const useAffectedDebugValue = (
-  state: object,
-  affected: WeakMap<object, unknown>
-) => {
-  const pathList = useRef<(string | number | symbol)[][]>()
-  useEffect(() => {
-    pathList.current = affectedToPathList(state, affected, true)
-  })
-  useDebugValue(pathList.current)
-}
 
 // This is required only for performance.
 // Ref: https://github.com/pmndrs/valtio/issues/519
@@ -162,10 +141,6 @@ export function useSnapshot<T extends object>(
     lastSnapshot.current = currSnapshot
     lastAffected.current = currAffected
   })
-  if (import.meta.env?.MODE !== 'production') {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useAffectedDebugValue(currSnapshot, currAffected)
-  }
   const proxyCache = useMemo(() => new WeakMap(), []) // per-hook proxyCache
   return createProxyToCompare(
     currSnapshot,
