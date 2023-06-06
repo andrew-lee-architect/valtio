@@ -1,7 +1,7 @@
 {
-  "name": "@andrew-lee-architect/valtio",
+  "name": "valtio",
   "private": false,
-  "version": "1.10.5",
+  "version": "1.10.6",
   "description": "💊 Valtio makes proxy-state simple for React and Vanilla",
   "main": "./dist/index.js",
   "files": [
